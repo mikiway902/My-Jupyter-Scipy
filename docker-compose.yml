@@ -1,0 +1,22 @@
+services:
+  jupyter:
+    build:
+      context: .
+      pull: true
+    image: ${IMAGE_NAME:-my-scipy}
+    container_name: ${CONTAINER_NAME:-jupyter}
+    # Поднимается вместе с Docker Desktop (после перезагрузки Windows),
+    # пока его не остановили вручную
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${JUPYTER_PORT:-8888}:8888"
+    environment:
+      # Токен для входа берётся из файла .env рядом
+      - JUPYTER_TOKEN=${JUPYTER_TOKEN}
+      # Настройки git (имя, email) храним в общей папке, чтобы не терялись
+      - GIT_CONFIG_GLOBAL=/home/jovyan/work/.gitconfig
+    volumes:
+      # Папка work на Windows = /home/jovyan/work в контейнере
+      - ./work:/home/jovyan/work
+    # Jupyter сразу открывается в общей папке
+    command: start-notebook.py --ServerApp.root_dir=/home/jovyan/work
