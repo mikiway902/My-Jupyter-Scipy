@@ -2,14 +2,25 @@
 FROM quay.io/jupyter/scipy-notebook:python-3.11
 
 # Свежий git из conda-forge (/opt/conda/bin в PATH раньше /usr/bin),
-# автоформатирование (jupyterlab-code-formatter + black + isort)
-# и обновление всех пакетов. Python не поднимется выше 3.11:
-# он закреплён в /opt/conda/conda-meta/pinned
-RUN mamba install -y -c conda-forge git \
-      jupyterlab_code_formatter black isort && \
-    mamba update -y --all && \
-    mamba clean -afy && \
-    fix-permissions "${CONDA_DIR}" && \
+# автоформатирование (jupyterlab-code-formatter + black + isort),
+# jupytext, LSP (автодополнение), время выполнения ячеек.
+# `mamba update --all` убран: базовый образ и так свежий, а полный
+# пересчёт и перекачка всех пакетов занимали основную часть сборки.
+# Кэш пакетов вынесен в cache mount (uid/gid = jovyan): при пересборке
+# уже скачанное не качается заново и не попадает в слой образа.
+RUN --mount=type=cache,target=/opt/conda/pkgs,uid=1000,gid=100 \
+    mamba install -y -c conda-forge git \
+      jupyterlab_code_formatter black isort \
+      jupytext jupyterlab-lsp python-lsp-server jupyterlab_execute_time
+
+# CAD: build123d (ядро OpenCascade в колёсах cadquery-ocp, они тяжёлые).
+# Через pip: на conda-forge заметно устаревшая версия
+RUN --mount=type=cache,target=/tmp/pip-cache,uid=1000,gid=100 \
+    pip install --cache-dir /tmp/pip-cache build123d
+
+# fix-permissions один раз в конце: на каждый вызов по /opt/conda
+# приходится копирование всех затронутых файлов в новый слой
+RUN fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}"
 
 # Форматирование Python (isort + black) при сохранении
