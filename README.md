@@ -48,6 +48,28 @@ Docker Desktop (запущенный).
 - Контейнер должен быть создан хотя бы раз через `docker compose up -d`.
 - `docker compose down` удаляет контейнер, и после перезагрузки он не поднимется. Чтобы сохранить автозапуск, останавливайте через `docker compose stop`.
 
+## Как добавить расширение JupyterLab
+
+Менеджер расширений в интерфейсе отключён: поиск через PyPI не работает, а всё, что поставлено из интерфейса, пропадает при пересоздании контейнера. Расширения добавляются в `Dockerfile`.
+
+1. Найдите пакет на https://conda-forge.org (предпочтительно) или https://pypi.org. Обычно он называется `jupyterlab-...` или `jupyterlab_...`.
+2. Добавьте имя в первый `RUN` с `mamba install` в `Dockerfile`.
+   Если пакета нет на conda-forge, добавьте его во второй `RUN`: `pip install --cache-dir /tmp/pip-cache build123d <новый-пакет>`.
+3. Пересоберите и перезапустите:
+
+   ```powershell
+   docker compose up -d --build
+   ```
+
+4. Обновите страницу JupyterLab. Проверить, что расширение подхвачено:
+
+   ```powershell
+   docker compose exec jupyter jupyter labextension list
+   ```
+
+Расширению может понадобиться своя настройка (например, форматирование при сохранении настроено в `overrides.json`).
+Уже установлены: jupyterlab-git, jupyterlab-lsp, jupyterlab_code_formatter, jupytext, jupyterlab_execute_time.
+
 ## Где лежат файлы
 
 Папка `work/` монтируется в `/home/jovyan/work`: всё, что вы сохраняете в Jupyter, остаётся на диске.

@@ -11,7 +11,13 @@ FROM quay.io/jupyter/scipy-notebook:python-3.11
 RUN --mount=type=cache,target=/opt/conda/pkgs,uid=1000,gid=100 \
     mamba install -y -c conda-forge git \
       jupyterlab_code_formatter black isort \
-      jupytext jupyterlab-lsp python-lsp-server jupyterlab_execute_time
+      jupytext jupyterlab-lsp python-lsp-server jupyterlab_execute_time \
+      jupyterlab-git
+
+# Панель PyPI Manager отключена: её поиск расширений не работает
+# (PyPI закрыл поисковый API), а поставленное из интерфейса пропадает
+# при пересоздании контейнера. Расширения добавляем здесь, в Dockerfile.
+RUN jupyter labextension disable @jupyterlab/extensionmanager-extension
 
 # CAD: build123d (ядро OpenCascade в колёсах cadquery-ocp, они тяжёлые).
 # Через pip: на conda-forge заметно устаревшая версия
