@@ -3,3 +3,4 @@ work/*
 !work/.gitkeep
 .ipynb_checkpoints/
 .tmp.driveupload/
+.venv/

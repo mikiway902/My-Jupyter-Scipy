@@ -1,9 +1,18 @@
 # My-Jupyter-Scipy
 
 JupyterLab (scipy-notebook, Python 3.11) в Docker. Внутри: git, автоформатирование
-при сохранении (black + isort), jupytext, LSP-автодополнение, build123d (CAD).
+при сохранении (black + isort), jupytext, LSP-автодополнение.
 
-## Требования
+## Запуск без Docker
+
+Нужен Python 3.12 для Windows (`py -3.12` должен работать). Двойной клик по `start.bat`:
+при первом запуске создаётся `.venv` и ставятся пакеты (несколько минут), дальше
+JupyterLab сразу открывается в браузере в папке `work/`. Закрыть: Ctrl+C в окне консоли.
+
+Добавить пакет: впишите его в список в `start.bat` и удалите папку `.venv` (пересоздастся
+при следующем запуске) или поставьте вручную: `.venv\Scripts\pip install <пакет>`.
+
+## Требования (Docker)
 
 Docker Desktop (запущенный).
 
@@ -54,7 +63,8 @@ Docker Desktop (запущенный).
 
 1. Найдите пакет на https://conda-forge.org (предпочтительно) или https://pypi.org. Обычно он называется `jupyterlab-...` или `jupyterlab_...`.
 2. Добавьте имя в первый `RUN` с `mamba install` в `Dockerfile`.
-   Если пакета нет на conda-forge, добавьте его во второй `RUN`: `pip install --cache-dir /tmp/pip-cache build123d <новый-пакет>`.
+   Если пакета нет на conda-forge, добавьте перед `fix-permissions` новый `RUN`:
+   `RUN --mount=type=cache,target=/tmp/pip-cache,uid=1000,gid=100 pip install --cache-dir /tmp/pip-cache <новый-пакет>`.
 3. Пересоберите и перезапустите:
 
    ```powershell

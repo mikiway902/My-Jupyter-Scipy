@@ -19,11 +19,6 @@ RUN --mount=type=cache,target=/opt/conda/pkgs,uid=1000,gid=100 \
 # при пересоздании контейнера. Расширения добавляем здесь, в Dockerfile.
 RUN jupyter labextension disable @jupyterlab/extensionmanager-extension
 
-# CAD: build123d (ядро OpenCascade в колёсах cadquery-ocp, они тяжёлые).
-# Через pip: на conda-forge заметно устаревшая версия
-RUN --mount=type=cache,target=/tmp/pip-cache,uid=1000,gid=100 \
-    pip install --cache-dir /tmp/pip-cache build123d
-
 # fix-permissions один раз в конце: на каждый вызов по /opt/conda
 # приходится копирование всех затронутых файлов в новый слой
 RUN fix-permissions "${CONDA_DIR}" && \
