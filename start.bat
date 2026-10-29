@@ -5,7 +5,7 @@ cd /d "%~dp0"
 if not exist ".venv\Scripts\jupyter-lab.exe" (
     py -3.12 -m venv .venv || (echo Python 3.12 not found: install it from python.org & pause & exit /b 1)
     .venv\Scripts\python -m pip install --upgrade pip
-    .venv\Scripts\pip install jupyterlab numpy scipy pandas matplotlib seaborn sympy ^
+    .venv\Scripts\pip install jupyterlab numpy scipy pandas matplotlib seaborn sympy openpyxl ^
         jupyterlab-code-formatter black isort jupytext jupyterlab-lsp python-lsp-server ^
         jupyterlab-execute-time jupyterlab-git || (echo Package install failed & pause & exit /b 1)
     rem extension manager search is broken (PyPI closed its search API), same as in Docker
